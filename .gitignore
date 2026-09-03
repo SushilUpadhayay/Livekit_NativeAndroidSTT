@@ -1,0 +1,53 @@
+# Built application files
+*.apk
+*.aar
+*.ap_
+*.aab
+
+# Files for the ART/Dalvik VM
+*.dex
+
+# Java class files
+*.class
+
+# Generated files
+bin/
+gen/
+out/
+build/
+app/build/
+**/build/
+
+# Gradle files
+.gradle/
+build/
+
+# Local configuration file (contains local Android SDK path)
+local.properties
+
+# Log Files
+*.log
+
+# Android Studio Navigation editor temp files
+.navigation/
+
+# Android Studio captures folder
+captures/
+
+# IntelliJ IDEA / Android Studio project files
+*.iml
+.idea/
+
+# Keystore files
+*.jks
+*.keystore
+
+# Android Profiling Memory Dumps
+*.hprof
+
+# OS generated files
+.DS_Store
+Thumbs.db
+
+# Cloned reference SDK repository (if inside workspace)
+client-sdk-android/

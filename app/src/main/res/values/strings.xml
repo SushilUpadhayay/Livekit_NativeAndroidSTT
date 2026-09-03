@@ -1,0 +1,7 @@
+<resources>
+    <string name="app_name">LiveKit Audio POC</string>
+    <string name="status_disconnected">Status: Disconnected</string>
+    <string name="mic_disabled">Microphone: Disabled</string>
+    <string name="mic_enabled">Microphone: Enabled (Streaming)</string>
+    <string name="permission_denied_msg">Microphone permission is required to stream audio to LiveKit.</string>
+</resources>
