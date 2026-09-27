@@ -1,0 +1,15 @@
+[project]
+name = "self-agent"
+version = "0.1.0"
+description = "LiveKit Agent and FastAPI Token Server"
+readme = "README.md"
+requires-python = ">=3.10"
+dependencies = [
+    "fastapi>=0.110.0",
+    "uvicorn[standard]>=0.28.0",
+    "python-dotenv>=1.0.0",
+    "livekit>=0.18.0",
+    "livekit-api>=0.8.0",
+    "livekit-agents>=1.0.0",
+    "livekit-plugins-ai-coustics>=0.3.0",
+]

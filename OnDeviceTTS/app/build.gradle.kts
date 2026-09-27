@@ -4,11 +4,11 @@ plugins {
 }
 
 android {
-    namespace = "com.example.ondevicestt"
+    namespace = "com.example.ondevicetts"
     compileSdk = 34
 
     defaultConfig {
-        applicationId = "com.example.ondevicestt"
+        applicationId = "com.example.ondevicetts"
         minSdk = 24
         targetSdk = 34
         versionCode = 1
@@ -32,10 +32,11 @@ android {
 }
 
 dependencies {
-    implementation("androidx.core:core-ktx:1.12.0")
+    implementation("androidx.core:core-ktx:1.13.1")
     implementation("androidx.appcompat:appcompat:1.6.1")
     implementation("androidx.recyclerview:recyclerview:1.3.2")
     implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.7.0")
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.7.3")
+    implementation("com.squareup.okhttp3:okhttp:4.12.0")
     implementation("io.livekit:livekit-android:2.28.1")
 }

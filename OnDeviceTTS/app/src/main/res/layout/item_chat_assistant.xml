@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:gravity="start"
+    android:paddingStart="12dp"
+    android:paddingEnd="48dp"
+    android:paddingTop="4dp"
+    android:paddingBottom="4dp">
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:layout_marginStart="4dp"
+        android:layout_marginBottom="2dp">
+
+        <TextView
+            android:id="@+id/assistantName"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Assistant"
+            android:textSize="11sp"
+            android:textStyle="bold"
+            android:textColor="#37474F" />
+
+        <TextView
+            android:id="@+id/ttsIndicator"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text=" • On-Device TTS"
+            android:textSize="10sp"
+            android:textColor="#2E7D32" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:background="@drawable/bg_chat_bubble_assistant"
+        android:orientation="vertical"
+        android:paddingHorizontal="14dp"
+        android:paddingVertical="10dp">
+
+        <TextView
+            android:id="@+id/assistantMessageText"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="#1F1F1F"
+            android:textSize="15sp"
+            android:lineSpacingExtra="2dp"
+            android:text="Assistant message text" />
+    </LinearLayout>
+
+    <TextView
+        android:id="@+id/assistantTimestamp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textSize="10sp"
+        android:textColor="#9E9E9E"
+        android:layout_marginTop="2dp"
+        android:layout_marginStart="4dp"
+        android:text="12:00" />
+
+</LinearLayout>

@@ -51,3 +51,10 @@ Thumbs.db
 
 # Cloned reference SDK repository (if inside workspace)
 client-sdk-android/
+
+venv/
+.env
+run.txt
+__pycache__
+uv.lock
+.env.local

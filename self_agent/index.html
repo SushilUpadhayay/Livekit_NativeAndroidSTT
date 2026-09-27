@@ -1,0 +1,639 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>LiveKit Agent Voice Playground</title>
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <!-- LiveKit Client SDK -->
+  <script src="https://cdn.jsdelivr.net/npm/livekit-client/dist/livekit-client.umd.min.js"></script>
+
+  <style>
+    :root {
+      --bg-primary: #0a0d14;
+      --bg-secondary: #131926;
+      --bg-card: rgba(23, 31, 48, 0.7);
+      --border-color: rgba(255, 255, 255, 0.08);
+      --border-active: rgba(99, 102, 241, 0.5);
+      --accent-primary: #6366f1;
+      --accent-hover: #4f46e5;
+      --accent-glow: rgba(99, 102, 241, 0.35);
+      --success: #10b981;
+      --success-glow: rgba(16, 185, 129, 0.35);
+      --danger: #ef4444;
+      --danger-hover: #dc2626;
+      --warning: #f59e0b;
+      --text-main: #f8fafc;
+      --text-muted: #94a3b8;
+      --radius-lg: 20px;
+      --radius-md: 12px;
+      --radius-sm: 8px;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background: radial-gradient(circle at 50% 0%, #1a2238 0%, var(--bg-primary) 75%);
+      color: var(--text-main);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: flex-start;
+      padding: 2rem 1rem;
+    }
+
+    .container {
+      width: 100%;
+      max-width: 900px;
+      display: flex;
+      flex-direction: column;
+      gap: 1.5rem;
+    }
+
+    header {
+      text-align: center;
+      margin-bottom: 0.5rem;
+    }
+
+    header h1 {
+      font-size: 2.2rem;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      background: linear-gradient(135deg, #ffffff 30%, #818cf8 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      margin-bottom: 0.5rem;
+    }
+
+    header p {
+      color: var(--text-muted);
+      font-size: 0.95rem;
+    }
+
+    .card {
+      background: var(--bg-card);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-lg);
+      padding: 1.75rem;
+      box-shadow: 0 20px 40px -15px rgba(0, 0, 0, 0.5);
+      transition: border-color 0.3s ease;
+    }
+
+    /* Status Banner */
+    .status-section {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1rem;
+      flex-wrap: wrap;
+    }
+
+    .status-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.6rem;
+      padding: 0.5rem 1rem;
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid var(--border-color);
+      border-radius: 9999px;
+      font-size: 0.875rem;
+      font-weight: 500;
+    }
+
+    .dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background: var(--text-muted);
+      transition: background-color 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    .dot.connected {
+      background: var(--success);
+      box-shadow: 0 0 10px var(--success);
+    }
+
+    .dot.connecting {
+      background: var(--warning);
+      box-shadow: 0 0 10px var(--warning);
+      animation: pulse 1.5s infinite;
+    }
+
+    .dot.disconnected {
+      background: var(--danger);
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.4; transform: scale(0.9); }
+    }
+
+    /* Voice Avatar & Orb Visualizer */
+    .visualizer-wrapper {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 2.5rem 1rem;
+      position: relative;
+    }
+
+    .orb-container {
+      position: relative;
+      width: 160px;
+      height: 160px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 1.5rem;
+    }
+
+    .orb-glow {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      border-radius: 50%;
+      background: radial-gradient(circle, var(--accent-primary) 0%, rgba(99, 102, 241, 0) 70%);
+      opacity: 0.3;
+      transform: scale(1);
+      transition: all 0.3s ease;
+    }
+
+    .orb {
+      width: 110px;
+      height: 110px;
+      border-radius: 50%;
+      background: linear-gradient(145deg, #1e1b4b, #312e81);
+      border: 2px solid rgba(255, 255, 255, 0.15);
+      box-shadow: 0 0 30px rgba(99, 102, 241, 0.3);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 2.5rem;
+      z-index: 1;
+      transition: all 0.3s ease;
+    }
+
+    .speaking .orb {
+      transform: scale(1.1);
+      border-color: #818cf8;
+      box-shadow: 0 0 45px rgba(99, 102, 241, 0.8);
+      animation: ripple 1.2s infinite ease-out;
+    }
+
+    .speaking .orb-glow {
+      transform: scale(1.6);
+      opacity: 0.8;
+    }
+
+    @keyframes ripple {
+      0% { box-shadow: 0 0 0 0 rgba(99, 102, 241, 0.6); }
+      70% { box-shadow: 0 0 0 25px rgba(99, 102, 241, 0); }
+      100% { box-shadow: 0 0 0 0 rgba(99, 102, 241, 0); }
+    }
+
+    .agent-status-text {
+      font-size: 1.1rem;
+      font-weight: 500;
+      color: var(--text-main);
+      text-align: center;
+    }
+
+    .agent-subtitle {
+      font-size: 0.85rem;
+      color: var(--text-muted);
+      margin-top: 0.25rem;
+    }
+
+    /* Controls */
+    .controls-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 1rem;
+      margin-top: 1rem;
+    }
+
+    .form-group {
+      display: flex;
+      flex-direction: column;
+      gap: 0.4rem;
+    }
+
+    label {
+      font-size: 0.8rem;
+      font-weight: 500;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    input, select {
+      background: rgba(15, 23, 42, 0.6);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-sm);
+      padding: 0.75rem 1rem;
+      font-size: 0.9rem;
+      color: var(--text-main);
+      outline: none;
+      transition: border-color 0.2s ease, box-shadow 0.2s ease;
+      font-family: inherit;
+    }
+
+    input:focus, select:focus {
+      border-color: var(--accent-primary);
+      box-shadow: 0 0 0 3px var(--accent-glow);
+    }
+
+    .button-group {
+      display: flex;
+      gap: 1rem;
+      margin-top: 1.5rem;
+      flex-wrap: wrap;
+    }
+
+    .btn {
+      flex: 1;
+      min-width: 140px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+      padding: 0.85rem 1.5rem;
+      border-radius: var(--radius-md);
+      font-size: 0.95rem;
+      font-weight: 600;
+      cursor: pointer;
+      border: none;
+      transition: all 0.2s ease;
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, var(--accent-primary) 0%, #4338ca 100%);
+      color: white;
+      box-shadow: 0 4px 15px var(--accent-glow);
+    }
+
+    .btn-primary:hover:not(:disabled) {
+      background: linear-gradient(135deg, var(--accent-hover) 0%, #3730a3 100%);
+      transform: translateY(-1px);
+    }
+
+    .btn-danger {
+      background: linear-gradient(135deg, var(--danger) 0%, #b91c1c 100%);
+      color: white;
+    }
+
+    .btn-danger:hover:not(:disabled) {
+      background: linear-gradient(135deg, var(--danger-hover) 0%, #991b1b 100%);
+      transform: translateY(-1px);
+    }
+
+    .btn-secondary {
+      background: rgba(255, 255, 255, 0.07);
+      color: var(--text-main);
+      border: 1px solid var(--border-color);
+    }
+
+    .btn-secondary:hover:not(:disabled) {
+      background: rgba(255, 255, 255, 0.12);
+    }
+
+    .btn:disabled {
+      opacity: 0.45;
+      cursor: not-allowed;
+      transform: none !important;
+    }
+
+    /* Logs & Activity Terminal */
+    .log-card {
+      margin-top: 0.5rem;
+    }
+
+    .log-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 0.75rem;
+    }
+
+    .log-header h3 {
+      font-size: 0.95rem;
+      font-weight: 600;
+      color: var(--text-muted);
+    }
+
+    .log-container {
+      background: #0b0f19;
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-sm);
+      height: 180px;
+      overflow-y: auto;
+      padding: 0.85rem;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.82rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.35rem;
+    }
+
+    .log-entry {
+      color: var(--text-muted);
+      line-height: 1.4;
+      word-break: break-all;
+    }
+
+    .log-entry.info { color: #38bdf8; }
+    .log-entry.success { color: #4ade80; }
+    .log-entry.warn { color: #fbbf24; }
+    .log-entry.error { color: #f87171; }
+    .log-time { color: #64748b; margin-right: 0.5rem; }
+
+    /* Audio Element container - keep in render tree so browsers output sound */
+    #audio-container {
+      position: fixed;
+      top: -1000px;
+      left: -1000px;
+      width: 1px;
+      height: 1px;
+      opacity: 0.01;
+      pointer-events: none;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    <header>
+      <h1>LiveKit Voice Agent Playground</h1>
+      <p>Connect and interact with your Python LiveKit Agent in real-time</p>
+    </header>
+
+    <!-- Main Voice Interface -->
+    <div class="card">
+      <div class="status-section">
+        <div class="status-badge">
+          <div id="status-dot" class="dot disconnected"></div>
+          <span id="status-text">Disconnected</span>
+        </div>
+        <div id="room-info" style="font-size: 0.85rem; color: var(--text-muted);">
+          Ready to connect
+        </div>
+      </div>
+
+      <div class="visualizer-wrapper" id="visualizer-wrapper">
+        <div class="orb-container">
+          <div class="orb-glow"></div>
+          <div class="orb" id="orb-icon">🎙️</div>
+        </div>
+        <div class="agent-status-text" id="agent-state-text">Ready for Call</div>
+        <div class="agent-subtitle" id="agent-subtitle">Click 'Start Call' to start talking with agent.py</div>
+      </div>
+
+      <!-- Action Buttons -->
+      <div class="button-group">
+        <button id="btn-connect" class="btn btn-primary" onclick="startCall()">
+          <span>📞</span> Start Call
+        </button>
+        <button id="btn-disconnect" class="btn btn-danger" onclick="disconnectCall()" disabled>
+          <span>🛑</span> Disconnect
+        </button>
+        <button id="btn-mute" class="btn btn-secondary" onclick="toggleMute()" disabled>
+          <span id="mute-icon">🎤</span> <span id="mute-text">Mute Mic</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- Configuration Settings -->
+    <div class="card">
+      <div class="controls-grid">
+        <div class="form-group">
+          <label for="room-input">Room Name</label>
+          <input type="text" id="room-input" placeholder="e.g. test-room" value="web-voice-room">
+        </div>
+        <div class="form-group">
+          <label for="participant-input">Your Name</label>
+          <input type="text" id="participant-input" placeholder="e.g. User" value="BrowserUser">
+        </div>
+        <div class="form-group">
+          <label for="agent-input">Agent Name</label>
+          <input type="text" id="agent-input" placeholder="e.g. my-agent" value="my-agent">
+        </div>
+      </div>
+    </div>
+
+    <!-- Event Logs -->
+    <div class="card log-card">
+      <div class="log-header">
+        <h3>LiveKit Connection & Event Log</h3>
+        <button class="btn btn-secondary" style="padding: 0.3rem 0.8rem; font-size: 0.75rem; min-width: auto;" onclick="clearLogs()">Clear</button>
+      </div>
+      <div class="log-container" id="log-container">
+        <div class="log-entry info"><span class="log-time">[Init]</span> Playground ready. Ensure agent.py is running.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Audio container to attach agent tracks -->
+  <div id="audio-container"></div>
+
+  <script>
+    let currentRoom = null;
+    let isMuted = false;
+
+    const btnConnect = document.getElementById('btn-connect');
+    const btnDisconnect = document.getElementById('btn-disconnect');
+    const btnMute = document.getElementById('btn-mute');
+    const muteIcon = document.getElementById('mute-icon');
+    const muteText = document.getElementById('mute-text');
+    const statusDot = document.getElementById('status-dot');
+    const statusText = document.getElementById('status-text');
+    const roomInfo = document.getElementById('room-info');
+    const visualizerWrapper = document.getElementById('visualizer-wrapper');
+    const agentStateText = document.getElementById('agent-state-text');
+    const agentSubtitle = document.getElementById('agent-subtitle');
+    const orbIcon = document.getElementById('orb-icon');
+    const logContainer = document.getElementById('log-container');
+
+    function log(message, type = 'info') {
+      const entry = document.createElement('div');
+      entry.className = `log-entry ${type}`;
+      const time = new Date().toLocaleTimeString();
+      entry.innerHTML = `<span class="log-time">[${time}]</span> ${message}`;
+      logContainer.appendChild(entry);
+      logContainer.scrollTop = logContainer.scrollHeight;
+    }
+
+    function clearLogs() {
+      logContainer.innerHTML = '';
+    }
+
+    function setStatus(state, message) {
+      statusDot.className = `dot ${state}`;
+      statusText.innerText = message || state.charAt(0).toUpperCase() + state.slice(1);
+    }
+
+    async function fetchToken() {
+      const roomName = document.getElementById('room-input').value.trim() || 'web-voice-room';
+      const participantName = document.getElementById('participant-input').value.trim() || 'BrowserUser';
+      const agentName = document.getElementById('agent-input').value.trim() || 'my-agent';
+
+      log(`Requesting token from FastAPI (/token) for room: <b>${roomName}</b>, agent: <b>${agentName}</b>...`);
+
+      const params = new URLSearchParams({
+        room_name: roomName,
+        participant_name: participantName,
+        agent_name: agentName
+      });
+
+      const response = await fetch(`/token?${params.toString()}`);
+      if (!response.ok) {
+        const errText = await response.text();
+        throw new Error(`Token fetch failed (${response.status}): ${errText}`);
+      }
+      return await response.json();
+    }
+
+    async function startCall() {
+      try {
+        btnConnect.disabled = true;
+        setStatus('connecting', 'Fetching token & connecting...');
+        agentStateText.innerText = 'Connecting...';
+        agentSubtitle.innerText = 'Negotiating WebRTC session with LiveKit Cloud...';
+
+        // 1. Fetch token from FastAPI
+        const tokenData = await fetchToken();
+        log(`Token acquired. Server URL: ${tokenData.server_url}`, 'success');
+
+        // 2. Initialize LiveKit Room
+        const Livekit = window.LivekitClient;
+        if (!Livekit) {
+          throw new Error('LiveKit Client SDK failed to load. Check internet connection.');
+        }
+
+        currentRoom = new Livekit.Room({
+          adaptiveStream: true,
+          dynacast: true,
+        });
+
+        // Setup event listeners
+        currentRoom
+          .on(Livekit.RoomEvent.Connected, () => {
+            setStatus('connected', 'Connected');
+            log(`Connected to room: ${currentRoom.name}`, 'success');
+            roomInfo.innerText = `Room: ${currentRoom.name} | Participant: ${tokenData.participant_name}`;
+            agentStateText.innerText = 'Listening';
+            agentSubtitle.innerText = 'Agent is ready. Speak into your microphone.';
+            btnDisconnect.disabled = false;
+            btnMute.disabled = false;
+          })
+          .on(Livekit.RoomEvent.Disconnected, (reason) => {
+            setStatus('disconnected', 'Disconnected');
+            log(`Disconnected: ${reason || 'Call ended'}`, 'warn');
+            resetUI();
+          })
+          .on(Livekit.RoomEvent.TrackSubscribed, (track, publication, participant) => {
+            log(`Track subscribed: ${track.kind} from ${participant.identity}`, 'info');
+            if (track.kind === Livekit.Track.Kind.Audio) {
+              const audioElement = track.attach();
+              audioElement.autoplay = true;
+              audioElement.volume = 1.0;
+              document.getElementById('audio-container').appendChild(audioElement);
+              audioElement.play().catch(e => {
+                log(`Audio play interrupted: ${e.message}`, 'warn');
+              });
+              log(`Agent audio attached and active`, 'success');
+            }
+          })
+          .on(Livekit.RoomEvent.TrackUnsubscribed, (track) => {
+            track.detach();
+          })
+          .on(Livekit.RoomEvent.ActiveSpeakersChanged, (speakers) => {
+            const isAgentSpeaking = speakers.some(s => s.isAgent || s.identity !== currentRoom.localParticipant.identity);
+            if (isAgentSpeaking) {
+              visualizerWrapper.classList.add('speaking');
+              agentStateText.innerText = 'Agent Speaking';
+              orbIcon.innerText = '🔊';
+            } else {
+              visualizerWrapper.classList.remove('speaking');
+              agentStateText.innerText = 'Listening';
+              orbIcon.innerText = '🎙️';
+            }
+          })
+          .on(Livekit.RoomEvent.ParticipantConnected, (participant) => {
+            log(`Participant joined: ${participant.identity} ${participant.isAgent ? '(Agent)' : ''}`, 'info');
+          })
+          .on(Livekit.RoomEvent.ParticipantDisconnected, (participant) => {
+            log(`Participant left: ${participant.identity}`, 'info');
+          });
+
+        // 3. Connect to the LiveKit server
+        await currentRoom.connect(tokenData.server_url, tokenData.token);
+
+        // 4. Publish Microphone
+        log('Publishing local microphone audio track...');
+        await currentRoom.localParticipant.setMicrophoneEnabled(true);
+        log('Microphone enabled & published', 'success');
+
+      } catch (err) {
+        console.error(err);
+        log(`Error: ${err.message}`, 'error');
+        setStatus('disconnected', 'Connection Error');
+        agentStateText.innerText = 'Connection Failed';
+        agentSubtitle.innerText = err.message;
+        resetUI();
+      }
+    }
+
+    async function disconnectCall() {
+      if (currentRoom) {
+        log('Disconnecting from room...');
+        await currentRoom.disconnect();
+        currentRoom = null;
+      }
+      resetUI();
+    }
+
+    async function toggleMute() {
+      if (!currentRoom || !currentRoom.localParticipant) return;
+      isMuted = !isMuted;
+      await currentRoom.localParticipant.setMicrophoneEnabled(!isMuted);
+      if (isMuted) {
+        muteIcon.innerText = '🔇';
+        muteText.innerText = 'Unmute Mic';
+        log('Microphone muted', 'warn');
+      } else {
+        muteIcon.innerText = '🎤';
+        muteText.innerText = 'Mute Mic';
+        log('Microphone unmuted', 'info');
+      }
+    }
+
+    function resetUI() {
+      btnConnect.disabled = false;
+      btnDisconnect.disabled = true;
+      btnMute.disabled = true;
+      visualizerWrapper.classList.remove('speaking');
+      orbIcon.innerText = '🎙️';
+      isMuted = false;
+      muteIcon.innerText = '🎤';
+      muteText.innerText = 'Mute Mic';
+      document.getElementById('audio-container').innerHTML = '';
+      if (!currentRoom) {
+        agentStateText.innerText = 'Ready for Call';
+        agentSubtitle.innerText = 'Click Start Call to talk with agent.py';
+      }
+    }
+  </script>
+</body>
+</html>

@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:gravity="start"
+    android:paddingStart="12dp"
+    android:paddingEnd="48dp"
+    android:paddingTop="4dp"
+    android:paddingBottom="4dp">
+
+    <TextView
+        android:id="@+id/nexaName"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="NEXA"
+        android:textSize="11sp"
+        android:textStyle="bold"
+        android:textColor="#37474F"
+        android:layout_marginBottom="2dp"
+        android:layout_marginStart="4dp" />
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:background="@drawable/bg_chat_bubble_nexa"
+        android:orientation="vertical"
+        android:paddingHorizontal="14dp"
+        android:paddingVertical="10dp">
+
+        <TextView
+            android:id="@+id/nexaMessageText"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="#1F1F1F"
+            android:textSize="15sp"
+            android:lineSpacingExtra="2dp"
+            android:text="NEXA message text" />
+    </LinearLayout>
+
+    <TextView
+        android:id="@+id/nexaTimestamp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textSize="10sp"
+        android:textColor="#9E9E9E"
+        android:layout_marginTop="2dp"
+        android:layout_marginStart="4dp"
+        android:text="12:00" />
+
+</LinearLayout>
